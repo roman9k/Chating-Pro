@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chating Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body{
+      font-family: Arial;
+      background:#0f172a;
+      color:white;
+      text-align:center;
+      padding:30px;
+    }
+
+    .box{
+      background:#1e293b;
+      padding:20px;
+      border-radius:15px;
+      max-width:350px;
+      margin:auto;
+      box-shadow:0 0 10px rgba(0,0,0,0.4);
+    }
+
+    input{
+      width:90%;
+      padding:12px;
+      margin-top:10px;
+      border:none;
+      border-radius:10px;
+    }
+
+    button{
+      padding:12px 20px;
+      border:none;
+      border-radius:10px;
+      background:#2563eb;
+      color:white;
+      margin-top:15px;
+      cursor:pointer;
+      width:95%;
+      font-size:16px;
+    }
+
+    img{
+      width:80px;
+      border-radius:50%;
+      margin-top:10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>Roman Chat</h2>
+
+  <button onclick="googleLogin()">
+    Login With Gmail
+  </button>
+
+  <div id="profile" style="display:none;">
+    <img id="photo">
+
+    <h3 id="name"></h3>
+
+    <p id="email"></p>
+
+    <input type="text" id="phone" placeholder="Add Phone Number">
+
+    <button onclick="savePhone()">
+      Save Number
+    </button>
+
+    <p id="status"></p>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<script>
+
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyCfrUNif9a9-ifdkYx8KEBNHpQeEN_m2f0",
+  authDomain: "chating-2cdaa.firebaseapp.com",
+  databaseURL: "https://chating-2cdaa-default-rtdb.firebaseio.com",
+  projectId: "chating-2cdaa",
+  storageBucket: "chating-2cdaa.firebasestorage.app",
+  messagingSenderId: "632538372952",
+  appId: "1:632538372952:web:079fd419599066f4ad232d",
+  measurementId: "G-DFMRR6QPEP"
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Google Login
+function googleLogin(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  auth.signInWithPopup(provider)
+  .then((result)=>{
+
+    const user = result.user;
+
+    document.getElementById('profile').style.display='block';
+
+    document.getElementById('name').innerText = user.displayName;
+
+    document.getElementById('email').innerText = user.email;
+
+    document.getElementById('photo').src = user.photoURL;
+
+  })
+  .catch((error)=>{
+    alert(error.message);
+  });
+}
+
+// Save Phone Number
+function savePhone(){
+
+  const user = auth.currentUser;
+
+  const phone = document.getElementById('phone').value;
+
+  if(!phone){
+    alert('Enter phone number');
+    return;
+  }
+
+  db.collection('users').doc(user.uid).set({
+    name:user.displayName,
+    email:user.email,
+    photo:user.photoURL,
+    phone:phone,
+    uid:user.uid
+  })
+  .then(()=>{
+    document.getElementById('status').innerText='Phone Number Saved Successfully';
+  })
+  .catch((error)=>{
+    alert(error.message);
+  });
+}
+
+</script>
+
+</body>
+</html>
